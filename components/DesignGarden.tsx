@@ -1,10 +1,9 @@
 import React, { useState, useMemo } from 'react';
-import { GoogleGenAI } from '@google/genai';
+import { GoogleGenAI, Modality } from '@google/genai';
 import { VEGETABLE_DATABASE, FARMING_SYSTEMS } from '../constants';
 import type { VegetableInfo, GardenData, FarmingSystem } from '../types';
 import { GreenhouseIcon, RaisedBedIcon, PotIcon, FieldIcon, SunFullIcon, SunPartialIcon, SunShadeIcon, PlusIcon, TrashIcon, PhotographIcon, CloseIcon } from './Icons';
 
-// = a-lot-of-code
 type CultivationType = 'Campo Aperto' | 'Serra' | 'Aiuole Rialzate' | 'Vasi';
 type SunExposure = 'Pieno Sole' | 'Mezz\'ombra' | 'Ombra Piena';
 
@@ -119,11 +118,12 @@ export const DesignGarden: React.FC<DesignGardenProps> = ({ latitude, longitude 
 
         try {
             const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-            // FIX: Removed the `config` object which was incorrectly restricting the response to only an image.
-            // The model can now return a multi-part response containing both text and an image, as requested by the prompt.
             const response = await ai.models.generateContent({
                 model: 'gemini-2.5-flash-image',
                 contents: { parts: parts },
+                config: {
+                    responseModalities: [Modality.IMAGE],
+                },
             });
             
             let foundText = false;

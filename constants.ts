@@ -1,17 +1,18 @@
-import type { NavItem, Task, Vegetable, VegetableInfo, FarmingSystem, Transaction, Contact, Harvest, CommunityPost, PartnerStore, CommunityUser } from './types';
-import { HomeIcon, LeafIcon, ChecklistIcon, SunIcon, SparklesIcon, BeakerIcon, CashIcon, HarvestIcon, CommunityIcon, EcommerceIcon, BioIcon, SyncIcon, TechIcon } from './components/Icons';
+import type { NavItem, Task, Vegetable, VegetableInfo, FarmingSystem, Transaction, Contact, Harvest, CommunityPost, PartnerStore, CommunityUser, MarketplaceItem, FaqItem } from './types';
+import { HomeIcon, LeafIcon, ChecklistIcon, SunIcon, SparklesIcon, BeakerIcon, CashIcon, HarvestIcon, CommunityIcon, EcommerceIcon, FaqIcon, BioIcon, SyncIcon, TechIcon } from './components/Icons';
 
 export const NAV_ITEMS: NavItem[] = [
   { name: 'Il mio Orto', icon: HomeIcon },
   { name: 'I miei ortaggi', icon: LeafIcon },
   { name: 'Check List', icon: ChecklistIcon },
-  { name: 'Weather', icon: SunIcon },
-  { name: 'Design Your Garden', icon: SparklesIcon },
-  { name: 'Your AgroGardener', icon: BeakerIcon },
-  { name: 'Cash Flow', icon: CashIcon },
-  { name: 'Harvests', icon: HarvestIcon },
+  { name: 'Meteo', icon: SunIcon },
+  { name: 'Progetta il tuo Orto', icon: SparklesIcon },
+  { name: 'Il tuo AgroGiardiniere', icon: BeakerIcon },
+  { name: 'Entrate/Uscite', icon: CashIcon },
+  { name: 'Raccolti', icon: HarvestIcon },
   { name: 'Community', icon: CommunityIcon },
   { name: 'E-Commerce', icon: EcommerceIcon },
+  { name: 'Faq', icon: FaqIcon },
 ];
 
 const today = new Date();
@@ -29,10 +30,10 @@ export const MOCK_TASKS: Task[] = [
 ];
 
 export const MOCK_VEGETABLES: Vegetable[] = [
-  { id: 1, name: 'Pomodoro San Marzano', plantingDate: '2024-05-15', status: 'Flowering', imageUrl: 'https://picsum.photos/seed/tomato/400/300' },
-  { id: 2, name: 'Zucchina Nera di Milano', plantingDate: '2024-06-01', status: 'Growing', imageUrl: 'https://picsum.photos/seed/zucchini/400/300' },
-  { id: 3, name: 'Basilico Genovese', plantingDate: '2024-05-20', status: 'Harvestable', imageUrl: 'https://picsum.photos/seed/basil/400/300' },
-  { id: 4, name: 'Lattuga Romana', plantingDate: '2024-06-10', status: 'Seedling', imageUrl: 'https://picsum.photos/seed/lettuce/400/300' },
+  { id: 1, name: 'Pomodoro San Marzano', plantingDate: '2024-05-15', status: 'Flowering', imageUrl: 'https://source.unsplash.com/400x300/?san-marzano-tomatoes' },
+  { id: 2, name: 'Zucchina Nera di Milano', plantingDate: '2024-06-01', status: 'Growing', imageUrl: 'https://source.unsplash.com/400x300/?dark-zucchini' },
+  { id: 3, name: 'Basilico Genovese', plantingDate: '2024-05-20', status: 'Harvestable', imageUrl: 'https://source.unsplash.com/400x300/?genovese-basil' },
+  { id: 4, name: 'Lattuga Romana', plantingDate: '2024-06-10', status: 'Seedling', imageUrl: 'https://source.unsplash.com/400x300/?romaine-lettuce' },
 ];
 
 export const VEGETABLE_DATABASE: VegetableInfo[] = [
@@ -95,13 +96,52 @@ export const MOCK_POSTS: CommunityPost[] = [
 ];
 
 export const MOCK_PARTNER_STORES: PartnerStore[] = [
-    { id: 1, name: 'Bio Emporio Srl', address: 'Via Roma 10, Milano', website: 'https://www.bioemporio.it', lat: 45.4642, lng: 9.1900 },
-    { id: 2, name: 'La Terra Fertile', address: 'Corso Vittorio Emanuele 150, Napoli', website: 'https://www.laterrafertile.it', lat: 40.8518, lng: 14.2681 },
-    { id: 3, name: 'Azienda Agricola Sole d\'Oro', address: 'Contrada da Sole, 1, Palermo', website: 'https://www.soledoro.it', lat: 38.1157, lng: 13.3615 },
+    { id: 1, name: 'Bio Emporio Srl', address: 'Via Roma 10, 20121 Milano', website: 'https://www.bioemporio.it', lat: 45.4642, lng: 9.1900 },
+    { id: 2, name: 'La Terra Fertile', address: 'Corso Vittorio Emanuele 150, 80132 Napoli', website: 'https://www.laterrafertile.it', lat: 40.8518, lng: 14.2681 },
+    { id: 3, name: 'Azienda Agricola Sole d\'Oro', address: 'Contrada da Sole, 1, 90123 Palermo', website: 'https://www.soledoro.it', lat: 38.1157, lng: 13.3615 },
 ];
 
 export const MOCK_USERS: CommunityUser[] = [
-    { id: 101, name: 'Luca Neri', bio: 'Coltivatore di ortaggi biologici', lat: 44.4949, lng: 11.3426 }, // Bologna
-    { id: 102, name: 'Sofia Gallo', bio: 'Apicoltrice e frutticoltrice', lat: 43.7696, lng: 11.2558 }, // Firenze
-    { id: 103, name: 'Davide Esposito', bio: 'Esperto di permacultura', lat: 41.9028, lng: 12.4964 }, // Roma
+    { id: 101, name: 'Luca Neri', bio: 'Coltivatore di ortaggi biologici - Bologna (40121)', lat: 44.4949, lng: 11.3426 },
+    { id: 102, name: 'Sofia Gallo', bio: 'Apicoltrice e frutticoltrice - Firenze (50122)', lat: 43.7696, lng: 11.2558 },
+    { id: 103, name: 'Davide Esposito', bio: 'Esperto di permacultura - Roma (00184)', lat: 41.9028, lng: 12.4964 },
+];
+
+export const MOCK_EQUIPMENT: MarketplaceItem[] = [
+  { id: 201, type: 'equipment', name: 'Zappa Manuale Rinforzata', description: 'Usata per una stagione, in ottime condizioni. Manico in faggio robusto.', price: 25, imageUrl: 'https://source.unsplash.com/400x300/?garden-hoe', seller: 'Marco Verdi', location: 'Bologna, BO', condition: 'Buono Stato' },
+  { id: 202, type: 'equipment', name: 'Motosega a scoppio 52cc', description: 'Perfettamente funzionante, necessita solo di una nuova catena. Potente e affidabile per potature.', price: 110, imageUrl: 'https://source.unsplash.com/400x300/?chainsaw', seller: 'Luca Neri', location: 'Firenze, FI', condition: 'Da Revisionare' },
+  { id: 203, type: 'equipment', name: 'Sistema di Irrigazione a Goccia (50m)', description: 'Kit completo per irrigare un piccolo orto. Usato pochissimo, come nuovo.', price: 40, imageUrl: 'https://source.unsplash.com/400x300/?drip-irrigation', seller: 'Giulia Bianchi', location: 'Napoli, NA', condition: 'Come Nuovo' },
+];
+
+export const MOCK_PRODUCE: MarketplaceItem[] = [
+  { id: 301, type: 'produce', name: 'Cassetta di Pomodori San Marzano (5kg)', description: 'Appena raccolti, dolcissimi e perfetti per conserve. Coltivazione biologica.', price: 15, imageUrl: 'https://source.unsplash.com/400x300/?tomatoes,crate', seller: 'Mario Rossi', location: 'Salerno, SA' },
+  { id: 302, type: 'produce', name: 'Mazzo di Basilico Genovese Fresco', description: 'Profumatissimo basilico, ideale per pesto e sughi. Raccolto giornalmente.', price: 3, imageUrl: 'https://source.unsplash.com/400x300/?basil,bunch', seller: 'Sofia Gallo', location: 'Genova, GE' },
+  { id: 303, type: 'produce', name: 'Zucchine Biologiche (1kg)', description: 'Zucchine tenere e saporite, senza trattamenti chimici. Ottime grigliate o trifolate.', price: 4.5, imageUrl: 'https://source.unsplash.com/400x300/?zucchini,basket', seller: 'Davide Esposito', location: 'Roma, RM' },
+];
+
+export const MOCK_FAQS: FaqItem[] = [
+  {
+    question: "Come posso aggiungere un nuovo ortaggio al mio elenco?",
+    answer: "Vai alla sezione 'I Miei Ortaggi' e clicca sul pulsante 'Aggiungi Ortaggio'. Inserisci il nome, la data di semina e lo stato iniziale. L'IA genererà un'immagine per te!",
+  },
+  {
+    question: "La previsione meteo è accurata per la mia zona?",
+    answer: "Sì, AgroIO utilizza la tua geolocalizzazione per fornire previsioni meteo precise e localizzate. Se non concedi l'accesso, mostreremo le previsioni per una località predefinita (Roma). Le previsioni includono allerte per pioggia e vento forte.",
+  },
+  {
+    question: "Cosa fa la sezione 'Progetta il tuo Orto'?",
+    answer: "Questa funzionalità ti guida passo dopo passo nella creazione del layout ideale per il tuo orto. Scegli il tipo di coltivazione, l'esposizione al sole, le piante e le dimensioni. La nostra IA ti fornirà un suggerimento di layout testuale e grafico ottimizzato per le consociazioni tra piante.",
+  },
+  {
+    question: "Come funziona l'AgroGiardiniere?",
+    answer: "L'AgroGiardiniere è il tuo agronomo personale basato sull'IA. Carica una foto di una pianta e riceverai un'analisi dettagliata del suo stato di salute, con l'identificazione di eventuali problemi e una lista di interventi consigliati.",
+  },
+  {
+    question: "Posso vendere i miei prodotti su AgroIO?",
+    answer: "Assolutamente! La sezione 'E-Commerce' è un marketplace dove puoi vendere i tuoi prodotti dal campo o attrezzatura usata. Clicca sul pulsante '+' per creare un nuovo annuncio in modo semplice e veloce, anche generando l'immagine con l'IA.",
+  },
+  {
+    question: "Cos'è un 'AgroHunter' nella Community?",
+    answer: "Un AgroHunter ci aiuta a far crescere la nostra rete di partner. Se segnali un negozio fisico che espone il nostro QR code (inviando una foto-testimonianza), riceverai 3 mesi di abbonamento gratis al tuo piano. È il nostro modo per ringraziarti!",
+  },
 ];

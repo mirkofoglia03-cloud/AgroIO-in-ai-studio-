@@ -7,13 +7,14 @@ interface SidebarProps {
   onNavClick: (view: NavItemType, tab?: string | null) => void;
   isOpen: boolean;
   setOpen: (isOpen: boolean) => void;
+  onProfileClick: () => void;
 }
 
 // =================================================================
 // SIDEBAR COMPONENT
 // =================================================================
 
-export const Sidebar: React.FC<SidebarProps> = ({ activeView, onNavClick, isOpen, setOpen }) => {
+export const Sidebar: React.FC<SidebarProps> = ({ activeView, onNavClick, isOpen, setOpen, onProfileClick }) => {
   return (
     <>
       {/* Overlay for mobile */}
@@ -57,13 +58,16 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeView, onNavClick, isOpen
         
         {/* <!-- User Profile Section --> */}
         <div className="p-4 border-t border-agro-green-light flex-shrink-0">
-          <div className="flex items-center">
+          <button 
+            onClick={onProfileClick}
+            className="flex items-center w-full text-left p-2 rounded-lg hover:bg-agro-green-light transition-colors"
+          >
             <img src="https://picsum.photos/seed/user/100/100" alt="User Avatar" className="w-10 h-10 rounded-full" />
             <div className="ml-3">
-              <p className="text-sm font-semibold">Mario Rossi</p>
+              <p className="text-sm font-semibold text-agro-white">Mario Rossi</p>
               <p className="text-xs text-agro-beige">Agricoltore</p>
             </div>
-          </div>
+          </button>
         </div>
       </aside>
     </>

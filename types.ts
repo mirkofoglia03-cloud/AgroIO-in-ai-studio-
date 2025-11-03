@@ -5,13 +5,14 @@ export type NavItemType =
   | 'Il mio Orto' 
   | 'I miei ortaggi' 
   | 'Check List' 
-  | 'Weather' 
-  | 'Design Your Garden' 
-  | 'Your AgroGardener' 
-  | 'Cash Flow' 
-  | 'Harvests' 
+  | 'Meteo' 
+  | 'Progetta il tuo Orto' 
+  | 'Il tuo AgroGiardiniere' 
+  | 'Entrate/Uscite' 
+  | 'Raccolti' 
   | 'Community' 
-  | 'E-Commerce';
+  | 'E-Commerce'
+  | 'Faq';
 
 export interface NavItem {
   name: NavItemType;
@@ -165,4 +166,23 @@ export interface CommunityUser {
   bio: string;
   lat: number;
   lng: number;
+}
+
+// E-Commerce
+export interface MarketplaceItem {
+  id: number;
+  type: 'equipment' | 'produce';
+  name: string;
+  description: string;
+  price: number;
+  imageUrl: string;
+  seller: string;
+  location: string;
+  condition?: 'Come Nuovo' | 'Buono Stato' | 'Da Revisionare';
+}
+
+// FAQ
+export interface FaqItem {
+  question: string;
+  answer: string;
 }

@@ -5,12 +5,14 @@ import { Dashboard } from './components/Dashboard';
 import { YourVegetables } from './components/YourVegetables';
 import { Checklist } from './components/Checklist';
 import { Weather } from './components/Weather';
-import { ComingSoon } from './components/ComingSoon';
+import { Ecommerce } from './components/Ecommerce';
 import { DesignGarden } from './components/DesignGarden';
 import { AgroGardener } from './components/AgroGardener';
 import { CashFlow } from './components/CashFlow';
 import { Harvests } from './components/Harvests';
 import { Community } from './components/Community';
+import { Faq } from './components/Faq';
+import { ProfileModal } from './components/ProfileModal';
 import { NAV_ITEMS } from './constants';
 import type { NavItemType, WeatherDay, TaskSuggestion } from './types';
 import { generateTaskSuggestions } from './lib/suggestions';
@@ -31,6 +33,7 @@ const mapWmoCodeToCondition = (code: number, windSpeed: number): WeatherDay['con
 const App: React.FC = () => {
   const [activeView, setActiveView] = useState<NavItemType>('Il mio Orto');
   const [isSidebarOpen, setSidebarOpen] = useState(false);
+  const [isProfileModalOpen, setProfileModalOpen] = useState(false);
   const [weatherData, setWeatherData] = useState<WeatherDay[] | null>(null);
   const [weatherLoading, setWeatherLoading] = useState(true);
   const [weatherError, setWeatherError] = useState<string | null>(null);
@@ -159,20 +162,22 @@ const App: React.FC = () => {
         return <YourVegetables />;
       case 'Check List':
         return <Checklist suggestions={taskSuggestions} />;
-      case 'Weather':
+      case 'Meteo':
         return <Weather weatherData={weatherData} weatherLoading={weatherLoading} weatherError={weatherError} latitude={location?.lat} longitude={location?.lon} />;
-      case 'Design Your Garden':
+      case 'Progetta il tuo Orto':
         return <DesignGarden latitude={location?.lat} longitude={location?.lon} />;
-      case 'Your AgroGardener':
+      case 'Il tuo AgroGiardiniere':
         return <AgroGardener />;
-      case 'Cash Flow':
+      case 'Entrate/Uscite':
         return <CashFlow />;
-      case 'Harvests':
+      case 'Raccolti':
         return <Harvests />;
       case 'Community':
         return <Community initialTab={initialCommunityTab} />;
       case 'E-Commerce':
-        return <ComingSoon pageTitle={activeView} />;
+        return <Ecommerce />;
+      case 'Faq':
+        return <Faq />;
       default:
         return <Dashboard setActiveView={handleNavClick} weatherData={weatherData} weatherLoading={weatherLoading} weatherError={weatherError} />;
     }
@@ -184,7 +189,13 @@ const App: React.FC = () => {
   return (
     <div className="flex min-h-screen bg-agro-gray-light font-sans text-gray-800">
       {/* ======================= SIDEBAR NAVIGATION ======================= */}
-      <Sidebar activeView={activeView} onNavClick={handleNavClick} isOpen={isSidebarOpen} setOpen={setSidebarOpen} />
+      <Sidebar 
+        activeView={activeView} 
+        onNavClick={handleNavClick} 
+        isOpen={isSidebarOpen} 
+        setOpen={setSidebarOpen} 
+        onProfileClick={() => setProfileModalOpen(true)}
+      />
 
       {/* ======================= MAIN CONTENT AREA ======================= */}
       <div className="flex-1 flex flex-col">
@@ -197,6 +208,8 @@ const App: React.FC = () => {
           {renderContent()}
         </main>
       </div>
+
+      {isProfileModalOpen && <ProfileModal onClose={() => setProfileModalOpen(false)} />}
     </div>
   );
 };

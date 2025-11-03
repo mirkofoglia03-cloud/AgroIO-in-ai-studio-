@@ -1,11 +1,10 @@
 import React, { useState, useMemo } from 'react';
-import ReactDOMServer from 'react-dom/server';
 import { MOCK_POSTS, MOCK_PARTNER_STORES, MOCK_USERS, VEGETABLE_DATABASE } from '../constants';
 import type { CommunityPost, PartnerStore, CommunityUser, VegetableInfo } from '../types';
-import { HeartIcon, ChatAltIcon, ShareIcon, MapPinIcon, PaperAirplaneIcon, BookOpenIcon, PlusIcon, HomeIcon, UserGroupIcon } from './Icons';
+import { HeartIcon, ChatAltIcon, ShareIcon, PaperAirplaneIcon, PlusIcon, PhotographIcon, TrashIcon, CheckIcon } from './Icons';
 import { GoogleGenAI, Modality } from '@google/genai';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
-import L from 'leaflet';
+import { UserMap } from './UserMap';
+
 
 // =================================================================
 // TAB: Bacheca
@@ -66,28 +65,113 @@ const Bacheca: React.FC = () => {
 // =================================================================
 // TAB: AgroHunter
 // =================================================================
-const AgroHunter: React.FC = () => {
-    type MapPoint = (PartnerStore & { type: 'store' }) | (CommunityUser & { type: 'user' });
+const ReportStoreForm: React.FC<{ onSubmitSuccess: () => void }> = ({ onSubmitSuccess }) => {
+    const [photo, setPhoto] = useState<{ file: File, preview: string } | null>(null);
+    const [formError, setFormError] = useState('');
+    const [storeName, setStoreName] = useState('');
+    const [storeAddress, setStoreAddress] = useState('');
 
-    const mapPoints = useMemo((): MapPoint[] => {
-        const stores: MapPoint[] = MOCK_PARTNER_STORES.map(s => ({ ...s, type: 'store' }));
-        const users: MapPoint[] = MOCK_USERS.map(u => ({ ...u, type: 'user' }));
-        return [...stores, ...users];
-    }, []);
-
-    const createColoredIcon = (color: string) => {
-        const iconHtml = ReactDOMServer.renderToString(<MapPinIcon className={`w-8 h-8 ${color} drop-shadow-lg`} />);
-        return L.divIcon({
-            html: iconHtml,
-            className: 'bg-transparent border-0',
-            iconSize: [32, 32],
-            iconAnchor: [16, 32],
-            popupAnchor: [0, -32],
-        });
+    const handlePhotoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (file) {
+            if (file.size > 5 * 1024 * 1024) { // 5MB limit
+                setFormError("La foto non può superare i 5MB.");
+                return;
+            }
+            setFormError('');
+            const preview = URL.createObjectURL(file);
+            setPhoto({ file, preview });
+        }
     };
-    
-    const storeIcon = createColoredIcon('text-agro-brown');
-    const userIcon = createColoredIcon('text-agro-green');
+
+    const handleReportSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!storeName || !storeAddress) {
+            setFormError('Nome negozio e indirizzo sono obbligatori.');
+            return;
+        }
+        if (!photo) {
+            setFormError('È richiesta una foto-testimonianza.');
+            return;
+        }
+        
+        console.log("Submitting:", { storeName, storeAddress, photo: photo.file.name });
+        setFormError('');
+        onSubmitSuccess();
+    };
+
+    return (
+        <div className="bg-white p-6 rounded-xl shadow-md">
+             <h3 className="text-xl font-bold text-agro-green mb-4">Segnala un Negozio</h3>
+             <form onSubmit={handleReportSubmit} className="space-y-4">
+                <div>
+                    <label htmlFor="storeName" className="block text-sm font-medium text-agro-brown mb-1">Nome Negozio</label>
+                    <input id="storeName" name="storeName" type="text" value={storeName} onChange={e => setStoreName(e.target.value)} className="w-full px-4 py-2 border border-agro-gray rounded-lg" placeholder="Es. Bio Emporio Srl" />
+                </div>
+                 <div>
+                    <label htmlFor="storeAddress" className="block text-sm font-medium text-agro-brown mb-1">Indirizzo Completo</label>
+                    <input id="storeAddress" name="storeAddress" type="text" value={storeAddress} onChange={e => setStoreAddress(e.target.value)} className="w-full px-4 py-2 border border-agro-gray rounded-lg" placeholder="Es. Via Roma 10, 20121 Milano" />
+                </div>
+                 <div>
+                    <label className="block text-sm font-medium text-agro-brown mb-1">Foto-testimonianza</label>
+                    {!photo ? (
+                        <label className="flex flex-col items-center justify-center w-full h-32 px-4 transition bg-white border-2 border-agro-gray border-dashed rounded-md appearance-none cursor-pointer hover:border-agro-green-light">
+                             <PhotographIcon className="w-10 h-10 text-agro-gray" />
+                            <span className="font-medium text-sm text-gray-600 mt-2">
+                                Clicca per caricare una foto
+                            </span>
+                             <span className="text-xs text-gray-500">PNG o JPG (max 5MB)</span>
+                            <input type="file" className="hidden" accept="image/png, image/jpeg" onChange={handlePhotoChange} />
+                        </label>
+                    ) : (
+                        <div className="relative">
+                            <img src={photo.preview} alt="Anteprima foto" className="w-full h-auto max-h-48 object-contain rounded-lg shadow-sm" />
+                            <button onClick={() => setPhoto(null)} className="absolute top-2 right-2 p-1.5 bg-black bg-opacity-60 text-white rounded-full hover:bg-opacity-80 transition-colors" aria-label="Rimuovi foto">
+                                <TrashIcon className="w-4 h-4" />
+                            </button>
+                        </div>
+                    )}
+                     <p className="text-xs text-gray-500 mt-1">Carica la foto dell'adesivo AgroIO esposto sulla vetrina del negozio.</p>
+                </div>
+                {formError && <p className="text-sm text-red-500">{formError}</p>}
+                <div className="text-right pt-2">
+                     <button type="submit" className="flex items-center ml-auto bg-agro-green text-white font-bold py-2 px-4 rounded-lg hover:bg-agro-green-light transition-colors">
+                        <PaperAirplaneIcon className="w-5 h-5 mr-2" />
+                        Invia Segnalazione
+                    </button>
+                </div>
+             </form>
+        </div>
+    );
+};
+
+const SuccessMessage: React.FC<{ onReset: () => void }> = ({ onReset }) => (
+    <div className="bg-white p-6 rounded-xl shadow-md">
+        <div className="text-center">
+            <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100">
+                <CheckIcon className="h-6 w-6 text-green-600" />
+            </div>
+            <h3 className="mt-5 text-2xl font-bold text-agro-green">Segnalazione Inviata!</h3>
+            <p className="mt-2 text-agro-brown font-serif">
+                Grazie per il tuo contributo! Verificheremo la foto-testimonianza al più presto.
+                Una volta confermata, attiveremo il tuo bonus di <strong>3 mesi di abbonamento GRATIS</strong>.
+            </p>
+            <div className="mt-6">
+                <button
+                    onClick={onReset}
+                    className="flex items-center mx-auto bg-agro-green text-white font-bold py-2 px-4 rounded-lg hover:bg-agro-green-light transition-colors"
+                >
+                    <PlusIcon className="w-5 h-5 mr-2" />
+                    Segnala un altro negozio
+                </button>
+            </div>
+        </div>
+    </div>
+);
+
+
+const AgroHunter: React.FC = () => {
+    const [submitted, setSubmitted] = useState(false);
 
     return (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -103,74 +187,19 @@ const AgroHunter: React.FC = () => {
                         <p className="text-sm text-agro-brown">Se il negozio che segnali espone il nostro QR code, riceverai <strong className="text-agro-green-light">3 mesi di abbonamento GRATIS</strong> al tuo piano tariffario.</p>
                     </div>
                 </div>
-                <div className="bg-white p-6 rounded-xl shadow-md">
-                     <h3 className="text-xl font-bold text-agro-green mb-4">Segnala un Negozio</h3>
-                     <form className="space-y-4">
-                        <div>
-                            <label className="block text-sm font-medium text-agro-brown mb-1">Nome Negozio</label>
-                            <input type="text" className="w-full px-4 py-2 border border-agro-gray rounded-lg" placeholder="Es. Bio Emporio Srl" />
-                        </div>
-                         <div>
-                            <label className="block text-sm font-medium text-agro-brown mb-1">Indirizzo Completo</label>
-                            <input type="text" className="w-full px-4 py-2 border border-agro-gray rounded-lg" placeholder="Es. Via Roma 10, Milano" />
-                        </div>
-                        <div className="text-right">
-                             <button type="submit" className="flex items-center ml-auto bg-agro-green text-white font-bold py-2 px-4 rounded-lg hover:bg-agro-green-light transition-colors">
-                                <PaperAirplaneIcon className="w-5 h-5 mr-2" />
-                                Invia Segnalazione
-                            </button>
-                        </div>
-                     </form>
-                </div>
+                {submitted ? (
+                    <SuccessMessage onReset={() => setSubmitted(false)} />
+                ) : (
+                    <ReportStoreForm onSubmitSuccess={() => setSubmitted(true)} />
+                )}
             </div>
 
-            {/* Right Column: Map & List */}
-            <div className="bg-white p-6 rounded-xl shadow-md flex flex-col">
+            {/* Right Column: Map */}
+            <div className="bg-white p-6 rounded-xl shadow-md flex flex-col min-h-[500px] lg:min-h-0">
                 <h3 className="text-xl font-bold text-agro-green mb-4">La Nostra Rete</h3>
-                <div className="h-64 bg-agro-gray-light rounded-lg relative overflow-hidden mb-4">
-                    <MapContainer center={[41.9028, 12.4964]} zoom={6} scrollWheelZoom={true} className="h-full w-full">
-                        <TileLayer
-                            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                        />
-                        {mapPoints.map(point => (
-                             <Marker 
-                                key={`${point.type}-${point.id}`}
-                                position={[point.lat, point.lng]}
-                                icon={point.type === 'store' ? storeIcon : userIcon}
-                            >
-                                <Popup>
-                                    <strong className="text-agro-green">{point.name}</strong><br/>
-                                    <span className="text-sm text-agro-brown">{point.type === 'store' ? point.address : point.bio}</span>
-                                </Popup>
-                            </Marker>
-                        ))}
-                    </MapContainer>
+                <div className="flex-grow rounded-lg overflow-hidden flex flex-col">
+                    <UserMap users={MOCK_USERS} stores={MOCK_PARTNER_STORES} />
                 </div>
-                <ul className="space-y-3 flex-1 overflow-y-auto">
-                    {mapPoints.map(point => {
-                        const isStore = point.type === 'store';
-                        const Icon = isStore ? HomeIcon : UserGroupIcon;
-                        const description = isStore ? point.address : point.bio;
-                        
-                        return (
-                            <li key={`${point.type}-${point.id}`} className="flex items-center justify-between p-3 bg-agro-gray-light/50 rounded-md">
-                                <div className="flex items-center">
-                                    <Icon className={`w-6 h-6 mr-3 flex-shrink-0 ${isStore ? 'text-agro-brown' : 'text-agro-green'}`} />
-                                    <div>
-                                        <p className="font-semibold text-agro-brown">{point.name}</p>
-                                        <p className="text-xs text-gray-500">{description}</p>
-                                    </div>
-                                </div>
-                                {isStore && (
-                                     <a href={point.website} target="_blank" rel="noopener noreferrer" className="text-sm text-agro-green underline hover:text-agro-green-light flex-shrink-0 ml-2">
-                                        Visita
-                                    </a>
-                                )}
-                            </li>
-                        );
-                    })}
-                </ul>
             </div>
         </div>
     );

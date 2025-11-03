@@ -97,7 +97,7 @@ const WeatherWidget: React.FC<{
                     <p>Prob. Pioggia: {todayWeather.rainChance}%</p>
                 </div>
             </div>
-            <button onClick={() => setActiveView('Weather')} className="mt-6 w-full bg-agro-green text-white py-2 rounded-lg hover:bg-agro-green-light transition-colors">
+            <button onClick={() => setActiveView('Meteo')} className="mt-6 w-full bg-agro-green text-white py-2 rounded-lg hover:bg-agro-green-light transition-colors">
                 Vedi Previsioni
             </button>
         </div>
@@ -168,7 +168,7 @@ const HarvestsWidget: React.FC<{
                     </p>
                 </div>
             </div>
-            <button onClick={() => setActiveView('Harvests')} className="mt-6 w-full bg-agro-green text-white py-2 rounded-lg hover:bg-agro-green-light transition-colors">
+            <button onClick={() => setActiveView('Raccolti')} className="mt-6 w-full bg-agro-green text-white py-2 rounded-lg hover:bg-agro-green-light transition-colors">
                 Gestisci Raccolti
             </button>
         </div>
