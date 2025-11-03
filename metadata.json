@@ -1,0 +1,7 @@
+{
+  "name": "Copy of AgroIO",
+  "description": "An innovative web platform for small and medium-sized agricultural businesses and young farmers. AgroIO helps manage daily operations, plan activities, monitor weather, and connect with a community marketplace.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}
