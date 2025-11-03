@@ -1,6 +1,8 @@
 import React from 'react';
 import { NAV_ITEMS } from '../constants';
-import type { NavItemType } from '../types';
+import type { NavItemType, User, SubscriptionPlan } from '../types';
+import { isFeatureAllowed } from '../lib/utils';
+import { LockIcon } from './Icons';
 
 interface SidebarProps {
   activeView: NavItemType;
@@ -8,13 +10,16 @@ interface SidebarProps {
   isOpen: boolean;
   setOpen: (isOpen: boolean) => void;
   onProfileClick: () => void;
+  user: User;
+  plan: SubscriptionPlan;
+  onLogout: () => void;
 }
 
 // =================================================================
 // SIDEBAR COMPONENT
 // =================================================================
 
-export const Sidebar: React.FC<SidebarProps> = ({ activeView, onNavClick, isOpen, setOpen, onProfileClick }) => {
+export const Sidebar: React.FC<SidebarProps> = ({ activeView, onNavClick, isOpen, setOpen, onProfileClick, user, plan, onLogout }) => {
   return (
     <>
       {/* Overlay for mobile */}
@@ -32,9 +37,30 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeView, onNavClick, isOpen
         </div>
         
         {/* <!-- Navigation Links --> */}
-        <nav className="flex-1 px-4 py-4 space-y-2 overflow-y-auto hide-scrollbar">
+        <nav className="flex-1 px-4 py-4 space-y-2 overflow-y-auto hide-scrollbar min-h-0">
           {NAV_ITEMS.map((item) => {
             const isActive = activeView === item.name;
+            const isAllowed = isFeatureAllowed(item.plan, plan);
+
+            if (!isAllowed) {
+              return (
+                 <a
+                  key={item.name}
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    onNavClick('Upgrade');
+                  }}
+                  className="flex items-center px-4 py-3 rounded-lg text-agro-beige/50 cursor-pointer"
+                  title={`Esegui l'upgrade al piano ${item.plan} per sbloccare`}
+                >
+                  <item.icon className="w-6 h-6 mr-3" />
+                  <span className="text-sm flex-1">{item.name}</span>
+                  <LockIcon className="w-4 h-4" />
+                </a>
+              )
+            }
+
             return (
               <a
                 key={item.name}
@@ -62,11 +88,17 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeView, onNavClick, isOpen
             onClick={onProfileClick}
             className="flex items-center w-full text-left p-2 rounded-lg hover:bg-agro-green-light transition-colors"
           >
-            <img src="https://picsum.photos/seed/user/100/100" alt="User Avatar" className="w-10 h-10 rounded-full" />
+            <img src={`https://i.pravatar.cc/150?u=${user.email}`} alt="User Avatar" className="w-10 h-10 rounded-full" />
             <div className="ml-3">
-              <p className="text-sm font-semibold text-agro-white">Mario Rossi</p>
-              <p className="text-xs text-agro-beige">Agricoltore</p>
+              <p className="text-sm font-semibold text-agro-white truncate">{user.name} {user.surname}</p>
+              <p className="text-xs text-agro-beige capitalize">{plan} Plan</p>
             </div>
+          </button>
+           <button 
+            onClick={onLogout}
+            className="w-full text-center text-xs text-agro-beige/70 hover:text-agro-beige mt-2 underline"
+          >
+            Esci
           </button>
         </div>
       </aside>

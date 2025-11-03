@@ -1,6 +1,27 @@
 import React from 'react';
 
-// Navigation
+// =================================================================
+// USER & SUBSCRIPTION
+// =================================================================
+export type SubscriptionPlan = 'Gratis' | 'Pro' | 'Business';
+
+export interface User {
+  id: number;
+  name: string;
+  surname: string;
+  address: string;
+  company?: string;
+  specialization?: string;
+  email: string;
+  website?: string;
+  lat: number;
+  lng: number;
+}
+
+
+// =================================================================
+// NAVIGATION
+// =================================================================
 export type NavItemType = 
   | 'Il mio Orto' 
   | 'I miei ortaggi' 
@@ -12,12 +33,18 @@ export type NavItemType =
   | 'Raccolti' 
   | 'Community' 
   | 'E-Commerce'
-  | 'Faq';
+  | 'Faq'
+  | 'Upgrade';
 
 export interface NavItem {
   name: NavItemType;
   icon: React.FC<{ className?: string }>;
+  plan: SubscriptionPlan | 'All';
 }
+
+// =================================================================
+// APP-WIDE TYPES
+// =================================================================
 
 // Weather
 export interface WeatherDay {

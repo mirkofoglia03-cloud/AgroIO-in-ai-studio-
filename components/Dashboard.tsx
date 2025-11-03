@@ -1,14 +1,49 @@
 import React, { useState, useEffect } from 'react';
-import type { NavItemType, WeatherDay, Task } from '../types';
-import { MOCK_TASKS, MOCK_VEGETABLES } from '../constants';
-import { SunIcon, CloudIcon, RainIcon, WindIcon, CloseIcon, CommunityIcon, HarvestIcon, EcommerceIcon } from './Icons';
+import type { NavItemType, WeatherDay, Task, User, SubscriptionPlan } from '../types';
+import { MOCK_TASKS, MOCK_VEGETABLES, MOCK_PARTNER_STORES, MOCK_USERS } from '../constants';
+import { SunIcon, CloudIcon, RainIcon, WindIcon, CloseIcon, CommunityIcon, EcommerceIcon, LockIcon, MapPinIcon } from './Icons';
+import { isFeatureAllowed } from '../lib/utils';
 
 interface DashboardProps {
   setActiveView: (view: NavItemType, tab?: string | null) => void;
   weatherData: WeatherDay[] | null;
   weatherLoading: boolean;
   weatherError: string | null;
+  user: User | null;
+  plan: SubscriptionPlan;
 }
+
+const FeatureLock: React.FC<{
+    plan: SubscriptionPlan;
+    requiredPlan: SubscriptionPlan;
+    children: React.ReactNode;
+    className?: string;
+    setActiveView: (view: NavItemType, tab?: string | null) => void;
+}> = ({ plan, requiredPlan, children, className, setActiveView }) => {
+    const isAllowed = isFeatureAllowed(requiredPlan, plan);
+
+    if (isAllowed) {
+        return <>{children}</>;
+    }
+
+    return (
+        <div className={`lg:col-span-1 bg-white p-6 rounded-xl shadow-md flex flex-col justify-between relative text-center ${className}`}>
+            <div className="blur-sm select-none pointer-events-none">{children}</div>
+            <div className="absolute inset-0 bg-white/80 flex flex-col items-center justify-center p-4 rounded-xl">
+                <LockIcon className="w-10 h-10 text-agro-brown mb-2" />
+                <h4 className="font-bold text-agro-green">Funzionalità {requiredPlan}</h4>
+                <p className="text-sm text-agro-brown mb-4">Esegui l'upgrade per sbloccare.</p>
+                <button 
+                    onClick={() => setActiveView('Upgrade')}
+                    className="bg-agro-green text-white font-bold py-2 px-4 rounded-lg hover:bg-agro-green-light"
+                >
+                    Upgrade Ora
+                </button>
+            </div>
+        </div>
+    );
+};
+
 
 const WeatherIconComponent: React.FC<{condition: WeatherDay['condition']}> = ({ condition }) => {
     switch (condition) {
@@ -26,7 +61,7 @@ const VegetablesWidget: React.FC<{
     const displayedVegetables = MOCK_VEGETABLES.slice(0, 4);
 
     return (
-        <div className="lg:col-span-1 bg-agro-white p-6 rounded-xl shadow-md flex flex-col justify-between hover:shadow-lg transition-shadow">
+        <div className="lg:col-span-1 bg-agro-white p-6 rounded-xl shadow-md flex flex-col justify-between interactive-card">
             <div>
                 <h3 className="font-bold text-xl text-agro-green mb-4">I Tuoi Ortaggi</h3>
                 {displayedVegetables.length > 0 ? (
@@ -47,7 +82,7 @@ const VegetablesWidget: React.FC<{
                     </div>
                 )}
             </div>
-            <button onClick={() => setActiveView('I miei ortaggi')} className="mt-6 w-full bg-agro-green text-white py-2 rounded-lg hover:bg-agro-green-light transition-colors">
+            <button onClick={() => setActiveView('I miei ortaggi')} className="mt-6 w-full btn-primary">
                 Gestisci Ortaggi
             </button>
         </div>
@@ -81,7 +116,7 @@ const WeatherWidget: React.FC<{
     const todayWeather = weatherData[0];
 
     return (
-        <div className="lg:col-span-1 bg-agro-white p-6 rounded-xl shadow-md flex flex-col justify-between hover:shadow-lg transition-shadow">
+        <div className="lg:col-span-1 bg-agro-white p-6 rounded-xl shadow-md flex flex-col justify-between interactive-card">
             <div>
                 <h3 className="font-bold text-xl text-agro-green mb-4">Meteo di Oggi</h3>
                 <div className="flex items-center justify-between">
@@ -97,7 +132,7 @@ const WeatherWidget: React.FC<{
                     <p>Prob. Pioggia: {todayWeather.rainChance}%</p>
                 </div>
             </div>
-            <button onClick={() => setActiveView('Meteo')} className="mt-6 w-full bg-agro-green text-white py-2 rounded-lg hover:bg-agro-green-light transition-colors">
+            <button onClick={() => setActiveView('Meteo')} className="mt-6 w-full btn-primary">
                 Vedi Previsioni
             </button>
         </div>
@@ -109,7 +144,7 @@ const ChecklistWidget: React.FC<{
 }> = ({ setActiveView }) => {
     const upcomingTasks = MOCK_TASKS.filter(task => !task.completed).slice(0, 3);
     return (
-        <div className="lg:col-span-1 bg-agro-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow flex flex-col">
+        <div className="lg:col-span-1 bg-agro-white p-6 rounded-xl shadow-md interactive-card flex flex-col">
           <div className="flex-1">
             <h3 className="font-bold text-xl text-agro-green mb-4">Prossime Attività</h3>
             <div className="space-y-4">
@@ -126,7 +161,7 @@ const ChecklistWidget: React.FC<{
               )}
             </div>
           </div>
-           <button onClick={() => setActiveView('Check List')} className="mt-6 w-full bg-agro-green text-white py-2 rounded-lg hover:bg-agro-green-light transition-colors">
+           <button onClick={() => setActiveView('Check List')} className="mt-6 w-full btn-primary">
             Vai alla Check List
           </button>
         </div>
@@ -137,7 +172,7 @@ const CommunityWidget: React.FC<{
     setActiveView: (view: NavItemType, tab?: string | null) => void;
 }> = ({ setActiveView }) => {
     return (
-        <div className="lg:col-span-1 bg-agro-white p-6 rounded-xl shadow-md flex flex-col justify-between hover:shadow-lg transition-shadow">
+        <div className="lg:col-span-1 bg-agro-white p-6 rounded-xl shadow-md flex flex-col justify-between interactive-card">
             <div>
                 <h3 className="font-bold text-xl text-agro-green mb-4">Grow up together</h3>
                 <div className="flex flex-col items-center text-center min-h-[120px] justify-center">
@@ -147,29 +182,61 @@ const CommunityWidget: React.FC<{
                     </p>
                 </div>
             </div>
-            <button onClick={() => setActiveView('Community')} className="mt-6 w-full bg-agro-green text-white py-2 rounded-lg hover:bg-agro-green-light transition-colors">
+            <button onClick={() => setActiveView('Community')} className="mt-6 w-full btn-primary">
                 Entra nella Community
             </button>
         </div>
     );
 };
 
-const HarvestsWidget: React.FC<{
+const MapWidget: React.FC<{
     setActiveView: (view: NavItemType, tab?: string | null) => void;
 }> = ({ setActiveView }) => {
+    // Take a few items to display on the map
+    const storesToShow = MOCK_PARTNER_STORES.slice(0, 2);
+    const usersToShow = MOCK_USERS.slice(0, 3);
+    
+    // Random positions for the map. This is just for visualization.
+    const positions = [
+        { top: '20%', left: '30%' },
+        { top: '50%', left: '70%' },
+        { top: '65%', left: '25%' },
+        { top: '35%', left: '80%' },
+        { top: '75%', left: '50%' },
+    ];
+
     return (
-        <div className="lg:col-span-1 bg-agro-white p-6 rounded-xl shadow-md flex flex-col justify-between hover:shadow-lg transition-shadow">
+        <div className="lg:col-span-1 bg-agro-white p-6 rounded-xl shadow-md flex flex-col justify-between interactive-card">
             <div>
-                <h3 className="font-bold text-xl text-agro-green mb-4">I miei Raccolti</h3>
-                <div className="flex flex-col items-center text-center min-h-[120px] justify-center">
-                    <HarvestIcon className="w-16 h-16 text-agro-brown mb-4" />
-                    <p className="text-agro-brown font-serif text-sm">
-                       Tieni traccia dei tuoi raccolti, analizza i dati di produzione e pianifica le vendite.
-                    </p>
+                <h3 className="font-bold text-xl text-agro-green mb-4">La Nostra Rete</h3>
+                <div className="relative w-full h-40 bg-agro-gray-light rounded-lg group">
+                    {/* Placeholder map background */}
+                    <img src="https://i.imgur.com/k2A0n1x.png" alt="Map background" className="w-full h-full object-cover rounded-lg" />
+                    <div className="absolute inset-0 bg-black/10 rounded-lg"></div>
+
+                    {/* Store Pins */}
+                    {storesToShow.map((store, index) => (
+                        <div key={`store-${store.id}`} className="absolute group/pin" style={positions[index]}>
+                            <MapPinIcon className="w-6 h-6 text-agro-green-light drop-shadow-md cursor-pointer transform group-hover/pin:scale-125 transition-transform" title={store.name} />
+                            <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-agro-green text-white text-xs px-2 py-1 rounded-md opacity-0 group-hover/pin:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">{store.name}</span>
+                        </div>
+                    ))}
+                    
+                    {/* User Pins */}
+                    {usersToShow.map((user, index) => (
+                        <div key={`user-${user.id}`} className="absolute group/pin" style={positions[index + storesToShow.length]}>
+                            <MapPinIcon className="w-6 h-6 text-agro-brown drop-shadow-md cursor-pointer transform group-hover/pin:scale-125 transition-transform" title={user.name}/>
+                             <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-agro-brown text-white text-xs px-2 py-1 rounded-md opacity-0 group-hover/pin:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">{user.name}</span>
+                        </div>
+                    ))}
+                </div>
+                 <div className="flex justify-center items-center space-x-4 mt-4 text-xs">
+                    <div className="flex items-center"><MapPinIcon className="w-4 h-4 text-agro-green-light mr-1" /> Negozi Partner</div>
+                    <div className="flex items-center"><MapPinIcon className="w-4 h-4 text-agro-brown mr-1" /> Utenti</div>
                 </div>
             </div>
-            <button onClick={() => setActiveView('Raccolti')} className="mt-6 w-full bg-agro-green text-white py-2 rounded-lg hover:bg-agro-green-light transition-colors">
-                Gestisci Raccolti
+            <button onClick={() => setActiveView('Community', 'agrohunter')} className="mt-6 w-full btn-primary">
+                Scopri la Rete
             </button>
         </div>
     );
@@ -179,7 +246,7 @@ const ECommerceWidget: React.FC<{
     setActiveView: (view: NavItemType, tab?: string | null) => void;
 }> = ({ setActiveView }) => {
     return (
-        <div className="lg:col-span-1 bg-agro-white p-6 rounded-xl shadow-md flex flex-col justify-between hover:shadow-lg transition-shadow">
+        <div className="lg:col-span-1 bg-agro-white p-6 rounded-xl shadow-md flex flex-col justify-between interactive-card">
             <div>
                 <h3 className="font-bold text-xl text-agro-green mb-4">E-Commerce</h3>
                 <div className="flex flex-col items-center text-center min-h-[120px] justify-center">
@@ -189,7 +256,7 @@ const ECommerceWidget: React.FC<{
                     </p>
                 </div>
             </div>
-            <button onClick={() => setActiveView('E-Commerce')} className="mt-6 w-full bg-agro-green text-white py-2 rounded-lg hover:bg-agro-green-light transition-colors">
+            <button onClick={() => setActiveView('E-Commerce')} className="mt-6 w-full btn-primary">
                 Vai al Marketplace
             </button>
         </div>
@@ -200,7 +267,7 @@ const ECommerceWidget: React.FC<{
 // =================================================================
 // DASHBOARD COMPONENT
 // =================================================================
-export const Dashboard: React.FC<DashboardProps> = ({ setActiveView, weatherData, weatherLoading, weatherError }) => {
+export const Dashboard: React.FC<DashboardProps> = ({ setActiveView, weatherData, weatherLoading, weatherError, user, plan }) => {
   const [showNotificationBanner, setShowNotificationBanner] = useState(false);
 
   useEffect(() => {
@@ -251,12 +318,12 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveView, weatherData
       {/* <!-- Welcome Header --> */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
-                <h1 className="text-4xl font-bold text-agro-green">Bentornato, Mario!</h1>
+                <h1 className="text-4xl font-bold text-agro-green">Bentornato, {user?.name}!</h1>
                 <p className="text-agro-brown mt-2 font-serif text-lg">Ecco il riepilogo della tua azienda agricola.</p>
             </div>
             <button
                 onClick={() => setActiveView('Community', 'agrohunter')}
-                className="flex-shrink-0 mt-2 sm:mt-0 flex items-center bg-agro-brown text-white font-bold py-2 px-5 rounded-lg hover:bg-opacity-90 transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5 duration-300"
+                className="flex-shrink-0 mt-2 sm:mt-0 flex items-center bg-agro-brown text-white font-bold py-2 px-5 rounded-lg hover:bg-opacity-90 transition-all shadow-md hover:shadow-xl transform hover:-translate-y-1 duration-300"
             >
                 <CommunityIcon className="w-5 h-5 mr-2" />
                 Diventa un AgroHunter
@@ -277,9 +344,15 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveView, weatherData
         <ChecklistWidget setActiveView={setActiveView} />
 
         {/* <!-- ROW 2 --> */}
-        <CommunityWidget setActiveView={setActiveView} />
-        <HarvestsWidget setActiveView={setActiveView} />
-        <ECommerceWidget setActiveView={setActiveView} />
+        <FeatureLock plan={plan} requiredPlan="Pro" setActiveView={setActiveView}>
+            <CommunityWidget setActiveView={setActiveView} />
+        </FeatureLock>
+        <FeatureLock plan={plan} requiredPlan="Pro" setActiveView={setActiveView}>
+            <MapWidget setActiveView={setActiveView} />
+        </FeatureLock>
+        <FeatureLock plan={plan} requiredPlan="Pro" setActiveView={setActiveView}>
+            <ECommerceWidget setActiveView={setActiveView} />
+        </FeatureLock>
 
       </div>
     </div>

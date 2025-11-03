@@ -9,7 +9,7 @@ const StatCard: React.FC<{ title: string; amount: number; color: string }> = ({ 
     const userLocale = navigator.language || 'it-IT';
     const formattedAmount = new Intl.NumberFormat(userLocale, { style: 'currency', currency: 'EUR' }).format(amount);
     return (
-        <div className="bg-white p-6 rounded-xl shadow-md">
+        <div className="bg-white p-6 rounded-xl shadow-md interactive-card">
             <p className="text-sm text-agro-brown">{title}</p>
             <p className={`text-3xl font-bold ${color}`}>{formattedAmount}</p>
         </div>
@@ -51,20 +51,20 @@ const PerformanceChart: React.FC<{ transactions: Transaction[] }> = ({ transacti
     return (
         <div className="bg-white p-6 rounded-xl shadow-md">
             <h3 className="text-xl font-bold text-agro-green mb-4 flex items-center"><ChartBarIcon className="w-6 h-6 mr-2" /> Andamento Attività (Ultimi 6 Mesi)</h3>
-            <div className="flex h-64">
+            <div className="flex h-64 border-b border-agro-gray pb-2">
                 {data.months.map(month => (
                     <div key={`${month.year}-${month.month}`} className="flex-1 flex flex-col justify-end items-center group">
                         <div className="w-full flex-grow flex items-end justify-center space-x-1 relative" title={`Entrate: ${new Intl.NumberFormat(userLocale, { style: 'currency', currency: 'EUR' }).format(month.income)}\nUscite: ${new Intl.NumberFormat(userLocale, { style: 'currency', currency: 'EUR' }).format(month.expense)}`}>
-                            <div className="w-1/2 bg-green-300 group-hover:bg-green-400 rounded-t-md transition-all duration-300" style={{ height: `${(month.income / data.maxAmount) * 100}%` }}></div>
-                            <div className="w-1/2 bg-red-300 group-hover:bg-red-400 rounded-t-md transition-all duration-300" style={{ height: `${(month.expense / data.maxAmount) * 100}%` }}></div>
+                            <div className="w-1/2 rounded-t-md transition-all duration-500" style={{ height: `${(month.income / data.maxAmount) * 100}%`, background: 'linear-gradient(to top, #588157, #A3B18A)' }}></div>
+                            <div className="w-1/2 rounded-t-md transition-all duration-500" style={{ height: `${(month.expense / data.maxAmount) * 100}%`, background: 'linear-gradient(to top, #E63946, #F18890)' }}></div>
                         </div>
                         <span className="text-xs text-agro-brown mt-2 flex-shrink-0">{month.label}</span>
                     </div>
                 ))}
             </div>
             <div className="flex items-center justify-center space-x-4 mt-4 text-sm">
-                <div className="flex items-center"><span className="w-3 h-3 bg-green-300 rounded-sm mr-2"></span>Entrate</div>
-                <div className="flex items-center"><span className="w-3 h-3 bg-red-300 rounded-sm mr-2"></span>Uscite</div>
+                <div className="flex items-center"><span className="w-3 h-3 rounded-sm mr-2" style={{background: '#588157'}}></span>Entrate</div>
+                <div className="flex items-center"><span className="w-3 h-3 rounded-sm mr-2" style={{background: '#E63946'}}></span>Uscite</div>
             </div>
         </div>
     );
@@ -184,8 +184,9 @@ export const CashFlow: React.FC = () => {
     }, [transactions]);
     
     const { customers, suppliers } = useMemo(() => {
-        const customerNames = new Set(transactions.filter(t => t.type === 'income').map(t => t.contactName));
-        const supplierNames = new Set(transactions.filter(t => t.type === 'expense').map(t => t.contactName));
+        // Fix: Explicitly type the Sets to avoid inference issues.
+        const customerNames: Set<string> = new Set(transactions.filter(t => t.type === 'income').map(t => t.contactName));
+        const supplierNames: Set<string> = new Set(transactions.filter(t => t.type === 'expense').map(t => t.contactName));
 
         const getContactsFromNames = (names: Set<string>) => {
             const contactMap = new Map<string, Contact>();
@@ -229,11 +230,15 @@ export const CashFlow: React.FC = () => {
     const { salesHistory, purchaseHistory } = useMemo(() => {
         const createHistoryData = (type: 'income' | 'expense'): ProductHistoryItem[] => {
             const relevantTransactions = transactions.filter(t => t.type === type);
-            const grouped = relevantTransactions.reduce((acc, t) => {
+            // Fix: Explicitly type the accumulator in the reduce function to prevent 'group' from being 'unknown'.
+            const grouped = relevantTransactions.reduce((acc: Record<string, {productName: string, transactions: Transaction[]}>, t) => {
                 const key = t.description.trim().toLowerCase();
-                if (!acc[key]) acc[key] = { productName: t.description, transactions: [] };
+                if (!acc[key]) {
+                    acc[key] = { productName: t.description, transactions: [] };
+                }
                 acc[key].transactions.push(t);
                 return acc;
+            // FIX: The initial value for the reduce function must be explicitly typed to ensure correct type inference for the accumulator.
             }, {} as Record<string, {productName: string, transactions: Transaction[]}>);
 
             return Object.values(grouped).map(group => {

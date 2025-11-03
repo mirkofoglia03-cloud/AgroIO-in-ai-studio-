@@ -19,7 +19,7 @@ const VegetableCard: React.FC<{ vegetable: Vegetable; onClick: () => void; }> = 
 
   return (
     <div 
-      className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
+      className="bg-white rounded-xl shadow-md overflow-hidden cursor-pointer interactive-card"
       onClick={onClick}
     >
       <div className="h-48 w-full bg-agro-gray-light relative">

@@ -225,7 +225,7 @@ const ItemCard: React.FC<{ item: MarketplaceItem, onClick: () => void }> = ({ it
     };
     
     return (
-        <div onClick={onClick} className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow cursor-pointer flex flex-col">
+        <div onClick={onClick} className="bg-white rounded-xl shadow-md overflow-hidden cursor-pointer flex flex-col interactive-card">
             <img className="h-48 w-full object-cover" src={item.imageUrl} alt={item.name} />
             <div className="p-4 flex flex-col flex-grow">
                 <h3 className="text-lg font-bold text-agro-green mb-2 truncate">{item.name}</h3>

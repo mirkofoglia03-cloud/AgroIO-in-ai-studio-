@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { MOCK_POSTS, MOCK_PARTNER_STORES, MOCK_USERS, VEGETABLE_DATABASE } from '../constants';
-import type { CommunityPost, PartnerStore, CommunityUser, VegetableInfo } from '../types';
+import type { CommunityPost, PartnerStore, CommunityUser, VegetableInfo, User } from '../types';
 import { HeartIcon, ChatAltIcon, ShareIcon, PaperAirplaneIcon, PlusIcon, PhotographIcon, TrashIcon, CheckIcon } from './Icons';
 import { GoogleGenAI, Modality } from '@google/genai';
 import { UserMap } from './UserMap';
@@ -38,7 +38,7 @@ const PostCard: React.FC<{ post: CommunityPost }> = ({ post }) => {
     );
 };
 
-const Bacheca: React.FC = () => {
+const Bacheca: React.FC<{ user: User | null }> = ({ user }) => {
     return (
         <div className="max-w-2xl mx-auto space-y-6">
             {/* Create Post */}
@@ -46,7 +46,7 @@ const Bacheca: React.FC = () => {
                 <textarea 
                     className="w-full p-2 border border-agro-gray rounded-lg focus:ring-agro-green-light focus:border-agro-green-light"
                     rows={3}
-                    placeholder="A cosa stai pensando, Mario?"
+                    placeholder={`A cosa stai pensando, ${user?.name}?`}
                 ></textarea>
                 <div className="flex justify-end mt-2">
                     <button className="bg-agro-green text-white font-bold py-2 px-6 rounded-lg hover:bg-agro-green-light transition-colors">
@@ -170,8 +170,26 @@ const SuccessMessage: React.FC<{ onReset: () => void }> = ({ onReset }) => (
 );
 
 
-const AgroHunter: React.FC = () => {
+const AgroHunter: React.FC<{ user: User | null }> = ({ user }) => {
     const [submitted, setSubmitted] = useState(false);
+
+    // Add current user to the list of users on the map
+    const allUsers = useMemo(() => {
+      if (user) {
+        const currentUserAsCommunityUser: CommunityUser = {
+          id: user.id,
+          name: `${user.name} ${user.surname}`,
+          bio: user.specialization || 'Nuovo membro AgroIO',
+          lat: user.lat,
+          lng: user.lng
+        };
+        // Avoid adding duplicates if mocks already contain the user
+        if (!MOCK_USERS.find(u => u.id === currentUserAsCommunityUser.id)) {
+          return [currentUserAsCommunityUser, ...MOCK_USERS];
+        }
+      }
+      return MOCK_USERS;
+    }, [user]);
 
     return (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -198,7 +216,7 @@ const AgroHunter: React.FC = () => {
             <div className="bg-white p-6 rounded-xl shadow-md flex flex-col min-h-[500px] lg:min-h-0">
                 <h3 className="text-xl font-bold text-agro-green mb-4">La Nostra Rete</h3>
                 <div className="flex-grow rounded-lg overflow-hidden flex flex-col">
-                    <UserMap users={MOCK_USERS} stores={MOCK_PARTNER_STORES} />
+                    <UserMap users={allUsers} stores={MOCK_PARTNER_STORES} />
                 </div>
             </div>
         </div>
@@ -321,9 +339,10 @@ const Contribuisci: React.FC = () => {
 // =================================================================
 interface CommunityProps {
     initialTab?: string | null;
+    user: User | null;
 }
 
-export const Community: React.FC<CommunityProps> = ({ initialTab }) => {
+export const Community: React.FC<CommunityProps> = ({ initialTab, user }) => {
     const getInitialTab = (): 'bacheca' | 'agrohunter' | 'contribuisci' => {
         if (initialTab === 'agrohunter') return 'agrohunter';
         if (initialTab === 'contribuisci') return 'contribuisci';
@@ -365,8 +384,8 @@ export const Community: React.FC<CommunityProps> = ({ initialTab }) => {
       
       {/* Tab Content */}
       <div>
-          {activeTab === 'bacheca' && <Bacheca />}
-          {activeTab === 'agrohunter' && <AgroHunter />}
+          {activeTab === 'bacheca' && <Bacheca user={user} />}
+          {activeTab === 'agrohunter' && <AgroHunter user={user} />}
           {activeTab === 'contribuisci' && <Contribuisci />}
       </div>
     </div>

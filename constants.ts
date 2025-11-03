@@ -2,17 +2,17 @@ import type { NavItem, Task, Vegetable, VegetableInfo, FarmingSystem, Transactio
 import { HomeIcon, LeafIcon, ChecklistIcon, SunIcon, SparklesIcon, BeakerIcon, CashIcon, HarvestIcon, CommunityIcon, EcommerceIcon, FaqIcon, BioIcon, SyncIcon, TechIcon } from './components/Icons';
 
 export const NAV_ITEMS: NavItem[] = [
-  { name: 'Il mio Orto', icon: HomeIcon },
-  { name: 'I miei ortaggi', icon: LeafIcon },
-  { name: 'Check List', icon: ChecklistIcon },
-  { name: 'Meteo', icon: SunIcon },
-  { name: 'Progetta il tuo Orto', icon: SparklesIcon },
-  { name: 'Il tuo AgroGiardiniere', icon: BeakerIcon },
-  { name: 'Entrate/Uscite', icon: CashIcon },
-  { name: 'Raccolti', icon: HarvestIcon },
-  { name: 'Community', icon: CommunityIcon },
-  { name: 'E-Commerce', icon: EcommerceIcon },
-  { name: 'Faq', icon: FaqIcon },
+  { name: 'Il mio Orto', icon: HomeIcon, plan: 'All' },
+  { name: 'I miei ortaggi', icon: LeafIcon, plan: 'Gratis' },
+  { name: 'Check List', icon: ChecklistIcon, plan: 'Gratis' },
+  { name: 'Meteo', icon: SunIcon, plan: 'Gratis' },
+  { name: 'Raccolti', icon: HarvestIcon, plan: 'Pro' },
+  { name: 'Il tuo AgroGiardiniere', icon: BeakerIcon, plan: 'Pro' },
+  { name: 'Community', icon: CommunityIcon, plan: 'Pro' },
+  { name: 'E-Commerce', icon: EcommerceIcon, plan: 'Pro' },
+  { name: 'Progetta il tuo Orto', icon: SparklesIcon, plan: 'Business' },
+  { name: 'Entrate/Uscite', icon: CashIcon, plan: 'Business' },
+  { name: 'Faq', icon: FaqIcon, plan: 'Gratis' },
 ];
 
 const today = new Date();
